@@ -12,6 +12,7 @@ import { ButtonGroup, ButtonGroupItem } from "@/components/base/button-group/but
 import { Button } from "@/components/base/buttons/button";
 import { ButtonUtility } from "@/components/base/buttons/button-utility";
 import { Input } from "@/components/base/input/input";
+import { cx } from "@/utils/cx";
 
 // ---------------------------------------------------------------------------
 // Data
@@ -147,6 +148,15 @@ const coverageBadge: Record<Coverage, { color: "success" | "warning" | "error" |
     none: { color: "gray", label: "None" },
 };
 
+// Compact table cell styles so all 10 columns fit without a horizontal
+// scrollbar on laptop screens: 16px side padding (instead of 24px) and
+// 12px text (instead of 14px). Same idea as tightening auto-layout
+// padding + dropping one type size in Figma.
+const headStyles = "px-4";
+// Cell text is 12px on laptops, back to 14px on wide screens (1536px+)
+// where the table has room to spare.
+const cellStyles = "px-4 text-xs 2xl:text-sm";
+
 // The filter tabs above the table, and how each one narrows down the rows.
 const filterTabs = [
     { id: "all", label: "All equipments" },
@@ -189,7 +199,9 @@ export default function EquipmentListPage() {
         <div className="flex min-h-dvh flex-col bg-primary">
             {/* Header navigation — lo-fi wordmark plus the six nav links */}
             <header className="flex h-16 w-full items-center border-b border-secondary bg-primary">
-                <div className="flex w-full items-center gap-10 px-8 lg:px-28">
+                {/* Side padding scales with the viewport: 32px on laptops, 112px
+                    only on true 1920px displays (matching the Figma margins). */}
+                <div className="flex w-full items-center gap-10 px-8 2xl:px-28">
                     <a href="/" className="text-md font-bold tracking-[0.3em] text-primary">
                         VENTION
                     </a>
@@ -214,11 +226,11 @@ export default function EquipmentListPage() {
             {/* Main content */}
             <main className="flex flex-col gap-8 pt-8 pb-12">
                 {/* Page title */}
-                <div className="px-8 lg:px-28">
+                <div className="px-8 2xl:px-28">
                     <h1 className="text-xl font-semibold text-primary">Equipment list</h1>
                 </div>
 
-                <div className="flex flex-col gap-6 px-8 lg:px-28">
+                <div className="flex flex-col gap-6 px-8 2xl:px-28">
                     {/* Filters bar: tabs on the left, search + filters on the right */}
                     <div className="flex flex-wrap items-end gap-3">
                         <div className="flex flex-1">
@@ -257,27 +269,27 @@ export default function EquipmentListPage() {
                     <TableCard.Root>
                         <Table aria-label="Equipment list">
                             <Table.Header>
-                                <Table.Head id="id" label="ID" />
-                                <Table.Head id="company" label="Company" isRowHeader />
-                                <Table.Head id="designName" label="Design name" className="w-full" />
-                                <Table.Head id="order" label="Order" />
-                                <Table.Head id="designId" label="Design ID" />
-                                <Table.Head id="machine" label="MachineMotion" />
-                                <Table.Head id="subscription" label="Subscription" />
-                                <Table.Head id="coverage" label="Coverage" />
-                                <Table.Head id="expiration" label="Expiration" />
-                                <Table.Head id="actions" />
+                                <Table.Head id="id" label="ID" className={headStyles} />
+                                <Table.Head id="company" label="Company" isRowHeader className={headStyles} />
+                                <Table.Head id="designName" label="Design name" className={cx(headStyles, "w-full")} />
+                                <Table.Head id="order" label="Order" className={headStyles} />
+                                <Table.Head id="designId" label="Design ID" className={headStyles} />
+                                <Table.Head id="machine" label="MachineMotion" className={headStyles} />
+                                <Table.Head id="subscription" label="Subscription" className={headStyles} />
+                                <Table.Head id="coverage" label="Coverage" className={headStyles} />
+                                <Table.Head id="expiration" label="Expiration" className={headStyles} />
+                                <Table.Head id="actions" className={headStyles} />
                             </Table.Header>
 
                             <Table.Body items={visibleEquipments}>
                                 {(item) => (
                                     <Table.Row id={item.id}>
-                                        <Table.Cell className="whitespace-nowrap">{item.id}</Table.Cell>
-                                        <Table.Cell className="whitespace-nowrap font-medium text-primary">{item.company}</Table.Cell>
-                                        <Table.Cell className="whitespace-nowrap font-medium text-primary">{item.designName}</Table.Cell>
-                                        <Table.Cell className="whitespace-nowrap">{item.order}</Table.Cell>
-                                        <Table.Cell className="whitespace-nowrap">{item.designId}</Table.Cell>
-                                        <Table.Cell>
+                                        <Table.Cell className={cx(cellStyles, "whitespace-nowrap")}>{item.id}</Table.Cell>
+                                        <Table.Cell className={cx(cellStyles, "whitespace-nowrap font-medium text-primary")}>{item.company}</Table.Cell>
+                                        <Table.Cell className={cx(cellStyles, "whitespace-nowrap font-medium text-primary")}>{item.designName}</Table.Cell>
+                                        <Table.Cell className={cx(cellStyles, "whitespace-nowrap")}>{item.order}</Table.Cell>
+                                        <Table.Cell className={cx(cellStyles, "whitespace-nowrap")}>{item.designId}</Table.Cell>
+                                        <Table.Cell className={cellStyles}>
                                             <div className="flex items-center gap-1">
                                                 <Badge type="modern" color="gray" size="sm">
                                                     {item.machine}
@@ -289,17 +301,17 @@ export default function EquipmentListPage() {
                                                 )}
                                             </div>
                                         </Table.Cell>
-                                        <Table.Cell>
+                                        <Table.Cell className={cellStyles}>
                                             <Badge type="pill-color" color="gray" size="sm">
                                                 {item.subscription}
                                             </Badge>
                                         </Table.Cell>
-                                        <Table.Cell>
+                                        <Table.Cell className={cellStyles}>
                                             <BadgeWithDot type="pill-color" color={coverageBadge[item.coverage].color} size="sm">
                                                 {coverageBadge[item.coverage].label}
                                             </BadgeWithDot>
                                         </Table.Cell>
-                                        <Table.Cell className="whitespace-nowrap">
+                                        <Table.Cell className={cx(cellStyles, "whitespace-nowrap")}>
                                             {item.expirationDate ? (
                                                 <div className="flex flex-col">
                                                     <span className="font-medium text-primary">{item.expirationDate}</span>
@@ -309,7 +321,7 @@ export default function EquipmentListPage() {
                                                 <span className="text-tertiary">n/a</span>
                                             )}
                                         </Table.Cell>
-                                        <Table.Cell className="px-4">
+                                        <Table.Cell className={cellStyles}>
                                             <ButtonUtility size="xs" color="tertiary" icon={Edit01} tooltip="Edit" />
                                         </Table.Cell>
                                     </Table.Row>
