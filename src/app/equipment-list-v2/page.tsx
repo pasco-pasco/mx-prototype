@@ -1,6 +1,7 @@
 "use client";
 
-// Equipment list screen — replicated from the Figma mockup (node 224:18806).
+// Equipment list v2 — same table as v1, but without the "Equipment detail"
+// slideout panel. The pen button is kept as a visual placeholder for now.
 // Everything on this page is assembled from Untitled UI components that
 // already live in src/components/.
 
@@ -14,7 +15,6 @@ import { Button } from "@/components/base/buttons/button";
 import { ButtonUtility } from "@/components/base/buttons/button-utility";
 import { Input } from "@/components/base/input/input";
 import { cx } from "@/utils/cx";
-import { EquipmentDetailSlideout } from "./equipment-detail-slideout";
 
 // ---------------------------------------------------------------------------
 // Data
@@ -212,10 +212,6 @@ export default function EquipmentListPage() {
     const [selectedFilter, setSelectedFilter] = useState<string>("all");
     // Current text typed in the search field.
     const [searchQuery, setSearchQuery] = useState("");
-    // The row whose pen button was clicked (null until the first click).
-    const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null);
-    // Whether the "Equipment detail" slideout panel is visible.
-    const [isSlideoutOpen, setIsSlideoutOpen] = useState(false);
 
     // Apply the selected tab first, then the search text on top of it.
     const visibleEquipments = equipments
@@ -380,19 +376,9 @@ export default function EquipmentListPage() {
                                             )}
                                         </Table.Cell>
                                         <Table.Cell className={cellStyles}>
-                                            <ButtonUtility
-                                                size="xs"
-                                                color="tertiary"
-                                                icon={Edit01}
-                                                tooltip="Edit"
-                                                // Remember which row was clicked, then open the panel.
-                                                // (onPress is React Aria's version of onClick — it also
-                                                // handles keyboard and touch activation.)
-                                                onPress={() => {
-                                                    setSelectedEquipment(item);
-                                                    setIsSlideoutOpen(true);
-                                                }}
-                                            />
+                                            {/* Placeholder for now — v2 has no slideout, so the pen
+                                                button doesn't do anything yet. */}
+                                            <ButtonUtility size="xs" color="tertiary" icon={Edit01} tooltip="Edit" />
                                         </Table.Cell>
                                     </Table.Row>
                                 )}
@@ -412,9 +398,6 @@ export default function EquipmentListPage() {
                     </TableCard.Root>
                 </div>
             </main>
-
-            {/* Equipment detail slideout — opens when a row's pen button is clicked */}
-            <EquipmentDetailSlideout equipment={selectedEquipment} isOpen={isSlideoutOpen} onOpenChange={setIsSlideoutOpen} />
         </div>
     );
 }
