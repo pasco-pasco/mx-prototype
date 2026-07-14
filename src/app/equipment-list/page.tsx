@@ -4,8 +4,9 @@
 // Everything on this page is assembled from Untitled UI components that
 // already live in src/components/.
 
-import { useState } from "react";
-import { ChevronDown, Edit01, FilterLines, SearchLg } from "@untitledui/icons";
+import { useEffect, useState } from "react";
+import { ChevronDown, Edit01, FilterLines, Moon01, SearchLg, Sun } from "@untitledui/icons";
+import { useTheme } from "next-themes";
 import { Table, TableCard } from "@/components/application/table/table";
 import { Badge, BadgeWithDot } from "@/components/base/badges/badges";
 import { ButtonGroup, ButtonGroupItem } from "@/components/base/button-group/button-group";
@@ -172,6 +173,34 @@ const filterTabs = [
 
 const navItems = ["Sales tools", "Ressources", "Parts", "Designs", "Organizations", "Admin"];
 
+// Small icon button that flips the app between light and dark mode.
+// It shows a moon while in light mode ("switch me to dark") and a sun
+// while in dark mode ("switch me back to light").
+function ThemeToggle() {
+    // `resolvedTheme` is the mode currently applied ("light" or "dark"),
+    // even when the user's choice is "follow the system setting".
+    const { resolvedTheme, setTheme } = useTheme();
+
+    // The server doesn't know the visitor's theme, so we wait until the
+    // component is mounted in the browser before showing the real icon.
+    // This avoids a mismatch between server and browser HTML (a
+    // "hydration error" — the warning you may have seen in dev tools).
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => setMounted(true), []);
+
+    const isDark = mounted && resolvedTheme === "dark";
+
+    return (
+        <ButtonUtility
+            size="sm"
+            color="tertiary"
+            icon={isDark ? Sun : Moon01}
+            tooltip={isDark ? "Switch to light mode" : "Switch to dark mode"}
+            onPress={() => setTheme(isDark ? "light" : "dark")}
+        />
+    );
+}
+
 export default function EquipmentListPage() {
     // Which filter tab is selected (defaults to "All equipments").
     const [selectedFilter, setSelectedFilter] = useState<string>("all");
@@ -225,6 +254,11 @@ export default function EquipmentListPage() {
                             ))}
                         </ul>
                     </nav>
+
+                    {/* ml-auto pushes the toggle to the far right of the header */}
+                    <div className="ml-auto">
+                        <ThemeToggle />
+                    </div>
                 </div>
             </header>
 

@@ -76,7 +76,7 @@ export const EquipmentDetailSlideout = ({ equipment, isOpen, onOpenChange }: Equ
                 <>
                     {/* Panel header: title + the X close button (built into the header) */}
                     <SlideoutMenu.Header onClose={close}>
-                        <h2 className="text-lg font-semibold text-primary">Equipment detail</h2>
+                        <h2 className="text-lg font-semibold text-primary">Equipment details</h2>
                     </SlideoutMenu.Header>
 
                     <SlideoutMenu.Content className="pb-6">
