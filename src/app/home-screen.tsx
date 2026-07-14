@@ -22,7 +22,7 @@ export const HomeScreen = () => {
             <h1 className="max-w-3xl text-center text-display-sm font-semibold text-primary">mx-prototype</h1>
 
             <p className="max-w-xl text-center text-lg text-tertiary">
-                A working Next.js + Untitled UI + Tailwind v4 skeleton. This page is the smoke test: if you can read this on Vercel, the stack works.
+                A working Next.js + UntitledUI React Library + Tailwind v4 skeleton. This page is the smoke test: if you can read this, the stack works.
             </p>
 
             {/* Smoke-test checklist: each row proves one part of the stack renders. */}
@@ -40,18 +40,6 @@ export const HomeScreen = () => {
                 </li>
             </ul>
 
-            {/* Untitled UI Button — iconTrailing takes an icon component,
-                the same way a Figma button exposes an icon swap property. */}
-            <Button
-                href="https://github.com/pasco-pasco/mx-prototype"
-                target="_blank"
-                rel="noopener noreferrer"
-                color="primary"
-                size="lg"
-                iconTrailing={ArrowRight}
-            >
-                View the repo
-            </Button>
         </div>
     );
 };

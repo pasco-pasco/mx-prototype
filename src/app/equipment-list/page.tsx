@@ -159,6 +159,12 @@ const headStyles = "px-4";
 // where the table has room to spare.
 const cellStyles = "px-4 text-xs 2xl:text-sm";
 
+// Text-link treatment for the Order and Design ID numbers. They keep the
+// cell's regular color at rest and show an underline on mouse hover — a
+// preview of the real links these will become. (Like a Figma hover state
+// swapping to an "underlined" variant.)
+const linkStyles = "cursor-pointer hover:underline hover:text-secondary transition duration-100 ease-linear";
+
 // The filter tabs above the table, and how each one narrows down the rows.
 const filterTabs = [
     { id: "all", label: "All equipments" },
@@ -326,8 +332,19 @@ export default function EquipmentListPage() {
                                         <Table.Cell className={cx(cellStyles, "whitespace-nowrap")}>{item.id}</Table.Cell>
                                         <Table.Cell className={cx(cellStyles, "whitespace-nowrap font-medium text-primary")}>{item.company}</Table.Cell>
                                         <Table.Cell className={cx(cellStyles, "whitespace-nowrap font-medium text-primary")}>{item.designName}</Table.Cell>
-                                        <Table.Cell className={cx(cellStyles, "whitespace-nowrap")}>{item.order}</Table.Cell>
-                                        <Table.Cell className={cx(cellStyles, "whitespace-nowrap")}>{item.designId}</Table.Cell>
+                                        {/* Order and Design ID will eventually link to their own pages.
+                                            For now they use a placeholder link (href="#") styled to
+                                            underline on hover, like a text-link component. */}
+                                        <Table.Cell className={cx(cellStyles, "whitespace-nowrap")}>
+                                            <a href="#" className={linkStyles}>
+                                                {item.order}
+                                            </a>
+                                        </Table.Cell>
+                                        <Table.Cell className={cx(cellStyles, "whitespace-nowrap")}>
+                                            <a href="#" className={linkStyles}>
+                                                {item.designId}
+                                            </a>
+                                        </Table.Cell>
                                         <Table.Cell className={cellStyles}>
                                             <div className="flex items-center gap-1">
                                                 <Badge type="modern" color="gray" size="sm">
