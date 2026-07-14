@@ -31,6 +31,8 @@ export interface CommonProps {
     tooltip?: string;
     /** The placement of the tooltip */
     tooltipPlacement?: Placement;
+    /** Handler that is called when the button is pressed (React Aria's replacement for onClick) */
+    onPress?: AriaButtonProps["onPress"];
 }
 
 /**
