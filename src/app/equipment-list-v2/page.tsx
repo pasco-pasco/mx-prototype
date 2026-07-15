@@ -233,8 +233,10 @@ export default function EquipmentListPage() {
 
     return (
         <div className="flex min-h-dvh flex-col bg-primary">
-            {/* Header navigation — lo-fi wordmark plus the six nav links */}
-            <header className="flex h-16 w-full items-center border-b border-secondary bg-primary">
+            {/* Header navigation — lo-fi wordmark plus the six nav links.
+                "sticky top-0" pins it to the top of the viewport on scroll,
+                and "z-50" keeps it layered above the page content below it. */}
+            <header className="sticky top-0 z-50 flex h-16 w-full items-center border-b border-secondary bg-primary">
                 {/* Side padding scales with the viewport: 32px on laptops, 112px
                     only on true 1920px displays (matching the Figma margins). */}
                 <div className="flex w-full items-center gap-10 px-8 2xl:px-28">
