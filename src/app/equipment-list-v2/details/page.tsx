@@ -6,9 +6,10 @@
 // radio-group card components. Everything is assembled from Untitled UI
 // components that already live in src/components/.
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { FC } from "react";
-import { Check, DotsVertical, Edit01, LayersThree01, LayersTwo01, Lock01, Moon01, Plus, Sun, Zap } from "@untitledui/icons";
+import { createPortal } from "react-dom";
+import { Check, DotsVertical, Edit01, LayersThree01, LayersTwo01, LinkBroken01, Lock01, Moon01, Plus, Sun, Zap } from "@untitledui/icons";
 import { useTheme } from "next-themes";
 import { Badge, BadgeWithIcon } from "@/components/base/badges/badges";
 import { Button } from "@/components/base/buttons/button";
@@ -138,6 +139,91 @@ function SectionHeader({ title, supportingText, showMenu = true }: { title: stri
     );
 }
 
+// Three-dot menu on the current subscription card. Opens a dropdown with the
+// destructive "Unlink subscription" action from Figma (node 260-3888).
+//
+// Portaled to document.body (same pattern as table tooltips) because React Aria
+// MenuTrigger does not reliably open on this page after SSR/hydration.
+function SubscriptionCardMenu() {
+    const triggerRef = useRef<HTMLButtonElement>(null);
+    const menuRef = useRef<HTMLDivElement>(null);
+    const [isOpen, setIsOpen] = useState(false);
+    const [position, setPosition] = useState({ top: 0, left: 0 });
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => setIsMounted(true), []);
+
+    const openMenu = () => {
+        const rect = triggerRef.current?.getBoundingClientRect();
+        if (rect) {
+            // Align menu to the right edge of the trigger (216px = w-54).
+            setPosition({ top: rect.bottom + 4, left: rect.right - 216 });
+        }
+        setIsOpen(true);
+    };
+
+    // Close when clicking outside or pressing Escape.
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const handlePointerDown = (event: PointerEvent) => {
+            const target = event.target as Node;
+            if (triggerRef.current?.contains(target) || menuRef.current?.contains(target)) return;
+            setIsOpen(false);
+        };
+
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === "Escape") setIsOpen(false);
+        };
+
+        document.addEventListener("pointerdown", handlePointerDown);
+        document.addEventListener("keydown", handleKeyDown);
+        return () => {
+            document.removeEventListener("pointerdown", handlePointerDown);
+            document.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [isOpen]);
+
+    return (
+        <>
+            <button
+                ref={triggerRef}
+                type="button"
+                aria-label="More options"
+                aria-haspopup="menu"
+                aria-expanded={isOpen}
+                onClick={() => (isOpen ? setIsOpen(false) : openMenu())}
+                onPointerDown={(event) => event.stopPropagation()}
+                className="group relative inline-flex h-max cursor-pointer items-center justify-center rounded-md p-1.5 text-fg-quaternary outline-focus-ring transition duration-100 ease-linear hover:bg-primary_hover hover:text-fg-quaternary_hover focus-visible:outline-2 focus-visible:outline-offset-2"
+            >
+                <DotsVertical data-icon className="size-5 transition-inherit-all" aria-hidden="true" />
+            </button>
+
+            {isMounted &&
+                isOpen &&
+                createPortal(
+                    <div
+                        ref={menuRef}
+                        role="menu"
+                        className="fixed z-[100] w-54 rounded-lg bg-primary py-1 shadow-lg ring-1 ring-secondary_alt"
+                        style={{ top: position.top, left: position.left }}
+                    >
+                        <button
+                            type="button"
+                            role="menuitem"
+                            className="group mx-1.5 flex w-[calc(100%-12px)] cursor-pointer items-center rounded-md px-2.5 py-2 text-left outline-hidden transition duration-100 ease-linear hover:bg-primary_hover focus-visible:bg-primary_hover focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus-ring"
+                            onClick={() => setIsOpen(false)}
+                        >
+                            <LinkBroken01 aria-hidden="true" className="mr-2 size-4 shrink-0 stroke-[2.25px] text-fg-error-primary" />
+                            <span className="truncate text-sm font-semibold text-error-primary">Unlink subscription</span>
+                        </button>
+                    </div>,
+                    document.body,
+                )}
+        </>
+    );
+}
+
 // One subscription card, modelled on the Untitled UI radio-group "icon card":
 // a header row (featured icon + plan name + assignment badge + menu) and a
 // body with the order number, expiration, and assign dropdown.
@@ -178,7 +264,11 @@ function SubscriptionCard({ subscription, isSelected = false }: { subscription: 
                     </Badge>
                 )}
 
-                <ButtonUtility size="sm" color="tertiary" icon={DotsVertical} tooltip="More options" />
+                {isSelected ? (
+                    <SubscriptionCardMenu />
+                ) : (
+                    <ButtonUtility size="sm" color="tertiary" icon={DotsVertical} tooltip="More options" />
+                )}
             </div>
 
             {/* Card body: three equal columns */}
@@ -295,7 +385,7 @@ export default function EquipmentDetailsPage() {
 
                             {/* All controllers on this equipment, with an edit
                                 button in the top-right corner of the card. */}
-                            <div className="relative rounded-lg p-3 ring-1 ring-secondary ring-inset">
+                            <div className="relative rounded-lg bg-secondary p-3 ring-1 ring-secondary ring-inset">
                                 <ul className="flex flex-col gap-2">
                                     {equipment.controllers.map((serial) => (
                                         <li key={serial} className="text-md text-tertiary">
