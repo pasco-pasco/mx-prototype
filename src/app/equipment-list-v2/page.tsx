@@ -378,9 +378,10 @@ export default function EquipmentListPage() {
                                             )}
                                         </Table.Cell>
                                         <Table.Cell className={cellStyles}>
-                                            {/* Placeholder for now — v2 has no slideout, so the pen
-                                                button doesn't do anything yet. */}
-                                            <ButtonUtility size="xs" color="tertiary" icon={Edit01} tooltip="Edit" />
+                                            {/* The pen button opens the equipment details page.
+                                                Giving ButtonUtility an href turns it into a link —
+                                                like a Figma prototype "On click → Navigate to". */}
+                                            <ButtonUtility size="xs" color="tertiary" icon={Edit01} tooltip="Edit" href="/equipment-list-v2/details" />
                                         </Table.Cell>
                                     </Table.Row>
                                 )}
