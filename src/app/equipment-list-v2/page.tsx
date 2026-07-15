@@ -16,6 +16,7 @@ import { Button } from "@/components/base/buttons/button";
 import { ButtonUtility } from "@/components/base/buttons/button-utility";
 import { Input } from "@/components/base/input/input";
 import { cx } from "@/utils/cx";
+import { MachineMotionCell } from "./machine-motion-cell";
 
 // ---------------------------------------------------------------------------
 // Data
@@ -31,9 +32,10 @@ interface Equipment {
     designName: string;
     order: string;
     designId: string;
-    // The MachineMotion serial chips. `extraMachines` renders the "+N" chip.
+    // Primary MachineMotion serial in the first badge. Any extras show as "+N"
+    // and reveal their serial numbers in a hover tooltip.
     machine: string;
-    extraMachines?: number;
+    extraMachineSerials?: string[];
     subscription: string;
     coverage: Coverage;
     // Expiration is two stacked lines: the date, and a supporting note.
@@ -62,7 +64,7 @@ const equipments: Equipment[] = [
         order: "86873",
         designId: "481045",
         machine: "MM2-2024-00455",
-        extraMachines: 3,
+        extraMachineSerials: ["MM2-2024-00412", "MM2-2024-00428", "MM2-2024-00439"],
         subscription: "Monitor",
         coverage: "active",
         expirationDate: "2027-05-01",
@@ -87,7 +89,7 @@ const equipments: Equipment[] = [
         order: "86873",
         designId: "481045",
         machine: "MM2-2024-00601",
-        extraMachines: 1,
+        extraMachineSerials: ["MM2-2024-00812"],
         subscription: "Rapide Care",
         coverage: "active",
         expirationDate: "2027-05-01",
@@ -100,7 +102,7 @@ const equipments: Equipment[] = [
         order: "86873",
         designId: "481045",
         machine: "MM2-2024-00601",
-        extraMachines: 1,
+        extraMachineSerials: ["MM2-2024-00903"],
         subscription: "Monitor",
         coverage: "expired",
         expirationDate: "2026-03-10",
@@ -338,7 +340,12 @@ export default function EquipmentListPage() {
                                 <Table.Head id="order" label="Order" className={headStyles} />
                                 <Table.Head id="designId" label="Design ID" className={headStyles} />
                                 <Table.Head id="machine" label="MachineMotion" className={headStyles} />
-                                <Table.Head id="subscription" label="Subscription" className={headStyles} />
+                                <Table.Head
+                                    id="subscription"
+                                    label="Subscription"
+                                    tooltip="Information about our subscription services"
+                                    className={headStyles}
+                                />
                                 <Table.Head id="coverage" label="Coverage" className={headStyles} />
                                 <Table.Head id="expiration" label="Expiration" className={headStyles} />
                                 <Table.Head id="actions" className={headStyles} />
@@ -364,19 +371,10 @@ export default function EquipmentListPage() {
                                             </a>
                                         </Table.Cell>
                                         <Table.Cell className={cellStyles}>
-                                            <div className="flex items-center gap-1">
-                                                <Badge type="modern" color="gray" size="sm">
-                                                    {item.machine}
-                                                </Badge>
-                                                {item.extraMachines && (
-                                                    <Badge type="modern" color="gray" size="sm">
-                                                        +{item.extraMachines}
-                                                    </Badge>
-                                                )}
-                                            </div>
+                                            <MachineMotionCell machine={item.machine} extraMachineSerials={item.extraMachineSerials} />
                                         </Table.Cell>
                                         <Table.Cell className={cellStyles}>
-                                            <Badge type="pill-color" color="gray" size="sm">
+                                            <Badge type="modern" color="gray" size="sm">
                                                 {item.subscription}
                                             </Badge>
                                         </Table.Cell>

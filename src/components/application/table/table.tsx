@@ -1,7 +1,8 @@
 "use client";
 
-import type { ComponentPropsWithRef, HTMLAttributes, MouseEvent, ReactNode, Ref, TdHTMLAttributes, ThHTMLAttributes } from "react";
-import { createContext, isValidElement, useContext, useLayoutEffect, useState } from "react";
+import type { ComponentPropsWithRef, HTMLAttributes, ReactNode, Ref, TdHTMLAttributes, ThHTMLAttributes } from "react";
+import { createContext, isValidElement, useContext, useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { ArrowDown, ChevronSelectorVertical, Copy01, Edit01, HelpCircle, Trash01 } from "@untitledui/icons";
 import type {
     CellProps as AriaCellProps,
@@ -24,7 +25,6 @@ import {
 import { Badge } from "@/components/base/badges/badges";
 import { Checkbox } from "@/components/base/checkbox/checkbox";
 import { Dropdown } from "@/components/base/dropdown/dropdown";
-import { Tooltip, TooltipTrigger } from "@/components/base/tooltip/tooltip";
 import { cx } from "@/utils/cx";
 
 export const TableRowActionsDropdown = () => (
@@ -174,6 +174,56 @@ const TableHeader = <T extends object>({ columns, children, bordered = true, cla
 
 TableHeader.displayName = "TableHeader";
 
+// Help icon tooltip for column headers. Portaled so it is not clipped by the
+// table card's overflow-hidden (React Aria tooltips inside tables are unreliable).
+function TableHeadTooltip({ content }: { content: string }) {
+    const triggerRef = useRef<HTMLButtonElement>(null);
+    const [isOpen, setIsOpen] = useState(false);
+    const [position, setPosition] = useState({ x: 0, y: 0 });
+    const [isMounted, setIsMounted] = useState(false);
+
+    useLayoutEffect(() => setIsMounted(true), []);
+
+    const openTooltip = () => {
+        const rect = triggerRef.current?.getBoundingClientRect();
+        if (rect) {
+            setPosition({ x: rect.left + rect.width / 2, y: rect.top });
+        }
+        setIsOpen(true);
+    };
+
+    return (
+        <>
+            <button
+                ref={triggerRef}
+                type="button"
+                aria-label={content}
+                className="cursor-pointer text-fg-quaternary transition duration-100 ease-linear hover:text-fg-quaternary_hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
+                onMouseEnter={openTooltip}
+                onMouseLeave={() => setIsOpen(false)}
+                onFocus={openTooltip}
+                onBlur={() => setIsOpen(false)}
+                onPointerDown={(event) => event.stopPropagation()}
+            >
+                <HelpCircle className="size-4" aria-hidden="true" />
+            </button>
+
+            {isMounted &&
+                isOpen &&
+                createPortal(
+                    <div
+                        role="tooltip"
+                        className="pointer-events-none fixed z-[100] max-w-xs -translate-x-1/2 -translate-y-[calc(100%+6px)] rounded-lg bg-primary-solid px-3 py-2 shadow-lg"
+                        style={{ left: position.x, top: position.y }}
+                    >
+                        <span className="text-xs font-semibold text-white">{content}</span>
+                    </div>,
+                    document.body,
+                )}
+        </>
+    );
+}
+
 interface TableHeadProps extends AriaColumnProps, Omit<ThHTMLAttributes<HTMLTableCellElement>, "children" | "className" | "style" | "id"> {
     label?: string;
     tooltip?: string;
@@ -201,13 +251,7 @@ const TableHead = ({ className, tooltip, label, children, ...props }: TableHeadP
                         {typeof children === "function" ? children(state) : children}
                     </div>
 
-                    {tooltip && (
-                        <Tooltip title={tooltip} placement="top">
-                            <TooltipTrigger className="cursor-pointer text-fg-quaternary transition duration-100 ease-linear hover:text-fg-quaternary_hover focus:text-fg-quaternary_hover">
-                                <HelpCircle className="size-4" />
-                            </TooltipTrigger>
-                        </Tooltip>
-                    )}
+                    {tooltip && <TableHeadTooltip content={tooltip} />}
 
                     {state.allowsSorting &&
                         (state.sortDirection ? (
