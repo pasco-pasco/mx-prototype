@@ -1,7 +1,7 @@
 "use client";
 
-import type { ComponentPropsWithRef, HTMLAttributes, ReactNode, Ref, TdHTMLAttributes, ThHTMLAttributes } from "react";
-import { createContext, isValidElement, useContext } from "react";
+import type { ComponentPropsWithRef, HTMLAttributes, MouseEvent, ReactNode, Ref, TdHTMLAttributes, ThHTMLAttributes } from "react";
+import { createContext, isValidElement, useContext, useLayoutEffect, useState } from "react";
 import { ArrowDown, ChevronSelectorVertical, Copy01, Edit01, HelpCircle, Trash01 } from "@untitledui/icons";
 import type {
     CellProps as AriaCellProps,
@@ -110,10 +110,20 @@ interface TableRootProps extends AriaTableProps, Omit<ComponentPropsWithRef<"tab
 const TableRoot = ({ className, size = "md", ...props }: TableRootProps) => {
     const context = useContext(TableContext);
 
+    // React Aria's table can ignore the first click inside cells after SSR
+    // (see adobe/react-spectrum#8239). Wait until the client has mounted
+    // before rendering the interactive grid so clicks work on first try.
+    const [isMounted, setIsMounted] = useState(false);
+    useLayoutEffect(() => setIsMounted(true), []);
+
     return (
         <TableContext.Provider value={{ size: context?.size ?? size }}>
             <div className="overflow-x-auto">
-                <AriaTable className={(state) => cx("w-full overflow-x-hidden", typeof className === "function" ? className(state) : className)} {...props} />
+                {isMounted ? (
+                    <AriaTable className={(state) => cx("w-full overflow-x-hidden", typeof className === "function" ? className(state) : className)} {...props} />
+                ) : (
+                    <div aria-hidden="true" className="h-144 w-full" />
+                )}
             </div>
         </TableContext.Provider>
     );

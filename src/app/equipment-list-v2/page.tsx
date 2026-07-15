@@ -8,6 +8,7 @@
 import { useEffect, useState } from "react";
 import { ChevronDown, Edit01, FilterLines, Moon01, SearchLg, Sun } from "@untitledui/icons";
 import { useTheme } from "next-themes";
+import { useRouter } from "next/navigation";
 import { Table, TableCard } from "@/components/application/table/table";
 import { Badge, BadgeWithDot } from "@/components/base/badges/badges";
 import { ButtonGroup, ButtonGroupItem } from "@/components/base/button-group/button-group";
@@ -178,6 +179,25 @@ const filterTabs = [
 // ---------------------------------------------------------------------------
 
 const navItems = ["Sales tools", "Ressources", "Parts", "Designs", "Organizations", "Admin"];
+
+const equipmentDetailsPath = "/equipment-list-v2/details";
+
+// Pen icon in the actions column. Uses onPress (not href) so navigation runs
+// through React Aria's press handler instead of fighting the table grid's
+// "first click focuses the row" behavior.
+function EquipmentEditLink() {
+    const router = useRouter();
+
+    return (
+        <ButtonUtility
+            size="xs"
+            color="tertiary"
+            icon={Edit01}
+            tooltip="Edit"
+            onPress={() => router.push(equipmentDetailsPath)}
+        />
+    );
+}
 
 // Small icon button that flips the app between light and dark mode.
 // It shows a moon while in light mode ("switch me to dark") and a sun
@@ -378,10 +398,7 @@ export default function EquipmentListPage() {
                                             )}
                                         </Table.Cell>
                                         <Table.Cell className={cellStyles}>
-                                            {/* The pen button opens the equipment details page.
-                                                Giving ButtonUtility an href turns it into a link —
-                                                like a Figma prototype "On click → Navigate to". */}
-                                            <ButtonUtility size="xs" color="tertiary" icon={Edit01} tooltip="Edit" href="/equipment-list-v2/details" />
+                                            <EquipmentEditLink />
                                         </Table.Cell>
                                     </Table.Row>
                                 )}
