@@ -9,10 +9,9 @@
 import { useEffect, useRef, useState } from "react";
 import type { FC } from "react";
 import { createPortal } from "react-dom";
-import { Check, DotsVertical, Edit01, LayersThree01, LayersTwo01, LinkBroken01, Lock01, Moon01, Plus, Sun, Zap } from "@untitledui/icons";
+import { Check, DotsVertical, Edit01, LayersThree01, LayersTwo01, LinkBroken01, Lock01, Moon01, Sun, Zap } from "@untitledui/icons";
 import { useTheme } from "next-themes";
 import { Badge, BadgeWithIcon } from "@/components/base/badges/badges";
-import { Button } from "@/components/base/buttons/button";
 import { ButtonUtility } from "@/components/base/buttons/button-utility";
 import { Input } from "@/components/base/input/input";
 import { InputBase } from "@/components/base/input/input";
@@ -396,11 +395,6 @@ export default function EquipmentDetailsPage() {
                                 <ButtonUtility size="sm" color="tertiary" icon={Edit01} tooltip="Edit controllers" className="absolute top-3 right-3" />
                             </div>
 
-                            <div>
-                                <Button color="secondary" size="sm" iconLeading={Plus}>
-                                    Add controller
-                                </Button>
-                            </div>
                         </section>
                     </div>
 
